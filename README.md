@@ -21,6 +21,16 @@ Esta API foi desenvolvida para gerenciar produtores, suas propriedades e as safr
   cd serasa-brain-ag-api
 ```
 
+---
+
+### Variáveis de Ambiente
+
+_Note:_ Este app foi desenvolvido para fins de teste técnico, então para facilitar o run da aplicação, o arquivo _.env_ foi mantido com todas as informações necessárias.
+
+_NÃO FAÇA ISSO EM PRODUÇÃO_
+
+---
+
 ### Rodando com Docker
 
 ```bash
@@ -63,4 +73,12 @@ Esta API foi desenvolvida para gerenciar produtores, suas propriedades e as safr
 
 ```bash
  npm run start:dev
+```
+
+---
+
+### Swagger
+
+```bash
+  http://localhost:3001/api
 ```
