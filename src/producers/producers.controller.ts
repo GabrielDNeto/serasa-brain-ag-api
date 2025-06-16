@@ -20,11 +20,13 @@ export class ProducersController {
   async getAllProducers(
     @Query('pageNumber') pageNumber: string,
     @Query('pageSizer') pageSize: string,
+    @Query('search') search: string,
   ) {
     return this.producersService.producers({
       page: Number(pageNumber),
       take: Number(pageSize),
       orderBy: { updatedAt: 'desc' },
+      search,
     });
   }
 

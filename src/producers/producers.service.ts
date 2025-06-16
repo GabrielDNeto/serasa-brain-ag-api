@@ -19,8 +19,9 @@ export class ProducersService {
     where?: Prisma.ProducerWhereInput;
     orderBy?: Prisma.ProducerOrderByWithRelationInput;
     page: number;
+    search?: string;
   }): Promise<PaginatedResponse<Producer>> {
-    const { take, cursor, where, orderBy, page } = params;
+    const { take, cursor, where, orderBy, page, search } = params;
 
     const limit = take || 10;
 
@@ -31,11 +32,25 @@ export class ProducersService {
         skip: offset,
         take: limit,
         cursor,
-        where,
+        where: search
+          ? {
+              OR: [
+                { name: { contains: search, mode: 'insensitive' } },
+                { document: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : undefined,
         orderBy,
       }),
       this.prisma.producer.count({
-        where,
+        where: search
+          ? {
+              OR: [
+                { name: { contains: search, mode: 'insensitive' } },
+                { document: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : where,
       }),
     ]);
 

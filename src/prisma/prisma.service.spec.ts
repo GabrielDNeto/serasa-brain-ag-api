@@ -1,18 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from './prisma.service';
 
 describe('PrismaService', () => {
-  let service: PrismaService;
+  let prismaService: PrismaService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [PrismaService],
-    }).compile();
-
-    service = module.get<PrismaService>(PrismaService);
+  beforeEach(() => {
+    prismaService = new PrismaService();
+    prismaService.$connect = jest.fn(); // mocka o método $connect
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('should call $connect on module init', async () => {
+    await prismaService.onModuleInit();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(prismaService.$connect).toHaveBeenCalled();
   });
 });
