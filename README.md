@@ -1,4 +1,4 @@
-# Sobre
+# Brain AG - Gestão de Produtores Rurais
 
 Esta API foi desenvolvida para gerenciar produtores, suas propriedades e as safras com culturas plantadas em cada propriedade.
 
