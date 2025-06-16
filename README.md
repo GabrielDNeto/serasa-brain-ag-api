@@ -77,6 +77,14 @@ _NÃO FAÇA ISSO EM PRODUÇÃO_
 
 ---
 
+### Testes
+
+```bash
+  npm test
+```
+
+---
+
 ### Swagger
 
 ```bash
