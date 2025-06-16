@@ -5,11 +5,12 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
-import { ProducersService } from './producers.service';
 import { Producer } from '@prisma/client';
 import { CreateProducerDto } from './dtos/create-producer.dto';
+import { ProducersService } from './producers.service';
 
 @Controller('producers')
 export class ProducersController {
@@ -37,6 +38,17 @@ export class ProducersController {
     @Body() producerData: CreateProducerDto,
   ): Promise<Producer> {
     return this.producersService.createProducer(producerData);
+  }
+
+  @Put(':id')
+  async updateProducer(
+    @Param('id') id: string,
+    @Body() producerData: CreateProducerDto,
+  ): Promise<Producer> {
+    return this.producersService.updateProducer({
+      where: { id: Number(id) },
+      data: producerData,
+    });
   }
 
   @Delete(':id')

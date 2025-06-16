@@ -112,7 +112,7 @@ export class ProducersService {
           name: property.name,
           city: property.city,
           state: property.state,
-          totalArea: property.arableArea + property.vegetationArea,
+          totalArea: property.totalArea,
           arableArea: property.arableArea,
           vegetationArea: property.vegetationArea,
           producerId: createdProducer.id,
@@ -127,7 +127,6 @@ export class ProducersService {
           },
         });
 
-        // Cria as culturas (crops)
         for (const crop of harvest.crops) {
           await this.prisma.crop.create({
             data: {
@@ -141,6 +140,110 @@ export class ProducersService {
     }
 
     return createdProducer;
+  }
+
+  async updateProducer(params: {
+    where: Prisma.ProducerWhereUniqueInput;
+    data: CreateProducerDto;
+  }) {
+    const { data, where } = params;
+
+    const producer = await this.prisma.producer.findUnique({
+      where,
+      include: {
+        properties: {
+          include: {
+            harvests: {
+              include: {
+                crops: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const existsProducer = await this.prisma.producer.findUnique({
+      where: {
+        document: data.document,
+      },
+    });
+
+    if (!producer) {
+      throw new NotFoundException('Produtor não encontrado.');
+    }
+
+    if (existsProducer && where.id !== existsProducer.id)
+      throw new ConflictException('Produtor já cadastrado com este CPF/CNPJ.');
+
+    const updatedProducer = await this.prisma.producer.update({
+      where,
+      data: {
+        name: data.name,
+        document: data.document,
+        city: data.city,
+        state: data.state,
+      },
+    });
+
+    for (const property of producer.properties) {
+      for (const harvest of property.harvests) {
+        await this.prisma.crop.deleteMany({
+          where: { harvestId: harvest.id },
+        });
+      }
+
+      await this.prisma.harvest.deleteMany({
+        where: { propertyId: property.id },
+      });
+    }
+
+    await this.prisma.property.deleteMany({
+      where: { producerId: producer.id },
+    });
+
+    for (const property of data.properties) {
+      const createdProperty = await this.prisma.property.create({
+        data: {
+          name: property.name,
+          city: property.city,
+          state: property.state,
+          totalArea: property.totalArea,
+          arableArea: property.arableArea,
+          vegetationArea: property.vegetationArea,
+          producer: {
+            connect: { id: producer.id },
+          },
+        },
+      });
+
+      for (const harvest of property.harvests) {
+        const createdHarvest = await this.prisma.harvest.create({
+          data: {
+            year: harvest.year,
+            property: {
+              connect: { id: createdProperty.id },
+            },
+          },
+        });
+
+        for (const crop of harvest.crops) {
+          await this.prisma.crop.create({
+            data: {
+              name: crop.name,
+              harvest: {
+                connect: { id: createdHarvest.id },
+              },
+              property: {
+                connect: { id: createdProperty.id },
+              },
+            },
+          });
+        }
+      }
+    }
+
+    return updatedProducer;
   }
 
   async deleteProducer(

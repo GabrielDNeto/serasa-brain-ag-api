@@ -5,5 +5,5 @@ export class CreateCropDto {
   name: string;
 
   @IsInt()
-  harvestId: number; // se necessário para relacionar
+  harvestId: number;
 }
